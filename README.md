@@ -4,19 +4,19 @@
 
 > MongoDB is a document database with the scalability and flexibility that you want with the querying and indexing that you need.
 
-<br/>
+![MongoDB diagram](./img1.jpg)
 
-![MongoDB diagram](https://geekboots.sfo2.cdn.digitaloceanspaces.com/post/what-is-mongodb-1564660915288.jpg)
-
-<br/>
+<sub><sup>
+[source](https://geekboots.sfo2.cdn.digitaloceanspaces.com/post/what-is-mongodb-1564660915288.jpg)
+</sup></sub>
 
 So we know that it is a document database but what it really means? Documents look like JSON files and data can be accessed in key-value way. Documents are stored in collections and collections in databases. Here is a good comparison to Relational Database Management Systems.
 
-<br/>
+![RDBMS vs MongoDB](./img2.png)
 
-![RDBMS vs MongoDB](https://csharpcorner-mindcrackerinc.netdna-ssl.com/article/approaching-mongodb-design-basic-principles/Images/data-storage.png)
-
-<br/>
+<sub><sup>
+[source](https://csharpcorner-mindcrackerinc.netdna-ssl.com/article/approaching-mongodb-design-basic-principles/Images/data-storage.png)
+</sup></sub>
 
 ---
 
@@ -38,9 +38,10 @@ So we know that it is a document database but what it really means? Documents lo
 Now we will create simple Java application to insert and retrieve data.
 To build it we will need:
 - [JDK (Java Development Kit)](https://www.oracle.com/java/technologies/downloads/)
-- [Gradle build tool](https://docs.gradle.org/current/userguide/what_is_gradle.html)
 - [Spring framework](https://start.spring.io/)
 - [MongoDB Community Edition](https://www.mongodb.com/try/download/community)
+
+Also check out what [Gradle build tool](https://docs.gradle.org/current/userguide/what_is_gradle.html) is.
 
 > The Spring Data MongoDB project provides integration with the MongoDB document database. Key functional areas of Spring Data MongoDB are a POJO centric model for interacting with a MongoDB DBCollection and easily writing a Repository style data access layer.
 
@@ -69,7 +70,7 @@ Then after clicking on the database name and then on the collection name you wil
 
 ### Connecting to the database from our project
 
-*application.properties* file located in the resource directory must contain these lines to connect to the database.
+***application.properties*** file located in the resource directory must contain these lines to connect to the database.
 
 ``
 spring.data.mongodb.uri=mongodb://localhost:27017/?readPreference=primary&directConnection=true&ssl=false
@@ -96,52 +97,63 @@ Your file with main method should look like this **(remember to use correct clas
         SpringApplication.run(TestMongodbApplication.class, args);
     }
 
-Okay, now lets create an interface that will define methods to access our data.
+Okay, now let's create an interface that will define methods to access our data.
 
     import org.springframework.data.mongodb.repository.MongoRepository;
-    public interface BookRepository extends MongoRepository<Book, String> {}
+    import java.util.List;
 
-Yes it's empty because we will use default inherited methods.
+    public interface BookRepository extends MongoRepository<Book, String> {
+        List<Book> findBookByPriceBetween(int price1, int price2);
+    }
 
-Now it's time for class for our documents (mine will contain only two fields - id and name):
+Method findBookByPriceBetween will allow us to return a list of books that have price in specified range.
+
+Now it's time for class for our documents (it will contain three fields - id, name and price):
 
     import org.springframework.data.annotation.Id;
     import org.springframework.data.mongodb.core.mapping.Document;
+
     @Document("book")
     public class Book {
         @Id
         public String id;
-
+    
         public String title;
-
-        public Book(String title) {
+    
+        public int price;
+    
+        public Book(String title, int price) {
             this.title = title;
+            this.price = price;
         }
-
+    
         @Override
         public String toString() {
-            return String.format("[Book] Id: %s Title: %s", id, title);
+            return String.format("[Book] Id: %s | Title: %s | Price: %d", id, title, price);
         }
     }
 
-Additionally I added a toString method to visualise retrieved data easily.
+Additionally, I added a toString method to visualise retrieved data easily.
 
 Now lets get back to our main class and perform some operations on the data **(add this method to class with main method)**:
 
     @Override
     public void run(String... args) {
-        bookRepository.deleteAll();
+		bookRepository.deleteAll();
 
-        bookRepository.save(new Book("Strange case of Dr Jekyll and Mr Hyde"));
-        bookRepository.save(new Book("The Art of War"));
-        bookRepository.save(new Book("Permanent Record"));
+		bookRepository.save(new Book("Strange case of Dr Jekyll and Mr Hyde", 20));
+		bookRepository.save(new Book("The Art of War", 999));
+		bookRepository.save(new Book("Permanent Record", 30));
 
         for(Book book: bookRepository.findAll()) {
             System.out.println(book);
         }
+
+        System.out.println(bookRepository.findBookByPriceBetween(25, 1000));
     }
 
 This code will delete any data that you previously created (if you did not don't worry there won't be any errors), insert three documents, retrieve and print them.
+After that it will print a list of books that have a price between 25 and 1000.
 
 ## Validation
 
@@ -149,22 +161,28 @@ In MongoDB Compass click *Validation* tab and then press *Add rule* button.
 Here is an example validation:
 
     {
-    $jsonSchema: {
-        bsonType: 'object',
-        required: [
-        'title'
-        ],
-        properties: {
-        title: {
-            bsonType: 'string',
-            description: 'Title of the book.'
+        $jsonSchema: {
+            bsonType: 'object',
+            required: [
+                'title',
+                'price'
+            ],
+            properties: {
+                title: {
+                    bsonType: 'string',
+                    description: 'Title of the book.'
+                },
+                price: {
+                    bsonType: 'int',
+                    description: 'Price of a book.'
+                }
+            }
         }
-        }
-    }
     }
 
-It requires all objects in this collection to have a title field that has a string value. You can also set validation action and level.
+It requires all objects in this collection to have a title and a price field. You can also set validation action and level.
 
 # The End
 
-I hope you now see how powerful and easy MongoDB is. Now you apply your knowledge in building your own projects. Thanks for following this tutorial and have a great day!
+I hope you now see how powerful and easy MongoDB is. Now you can apply your knowledge in building your own projects.
+Thanks for following this tutorial and have a great day!

@@ -34,10 +34,9 @@ public class MongodbTestApplication extends JFrame implements CommandLineRunner 
 	@Override
 	public void run(String... args) {
 		bookRepository.deleteAll();
-
-		bookRepository.save(new Book("Strange case of Dr Jekyll and Mr Hyde"));
-		bookRepository.save(new Book("The Art of War"));
-		bookRepository.save(new Book("Permanent Record"));
+		bookRepository.save(new Book("Strange case of Dr Jekyll and Mr Hyde", 20));
+		bookRepository.save(new Book("The Art of War", 999));
+		bookRepository.save(new Book("Permanent Record", 30));
 
 		String result = "";
 
@@ -46,6 +45,8 @@ public class MongodbTestApplication extends JFrame implements CommandLineRunner 
 		}
 
 		bookViewerPanel.getTextArea().setText(result);
+
+		System.out.println(bookRepository.findBookByPriceBetween(25, 1000));
 	}
 
 	private void initFrameUI() {

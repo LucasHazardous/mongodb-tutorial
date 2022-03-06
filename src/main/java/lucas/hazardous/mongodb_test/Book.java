@@ -9,12 +9,15 @@ public class Book {
 
     public String title;
 
-    public Book(String title) {
+    public int price;
+
+    public Book(String title, int price) {
         this.title = title;
+        this.price = price;
     }
 
     @Override
     public String toString() {
-        return String.format("[Book] Id: %s Title: %s", id, title);
+        return String.format("[Book] Id: %s | Title: %s | Price: %d", id, title, price);
     }
 }
