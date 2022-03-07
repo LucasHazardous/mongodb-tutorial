@@ -51,12 +51,17 @@ During MongoDB installation I recommend to leave defaults and it will work just 
 
 Use provided Spring framework link to generate a template for our project. And add **Spring Data MongoDB** dependency.
 
+I recommend adding **id application'** to build.gradle as well as these lines:
+
+    apply plugin: 'application'
+    mainClassName = 'lucas.hazardous.mongodb_test.MongodbTestApplication'
+
 ### Starting MongoDB
 
-To start working with MongoDB we first need to launch it and for that we will use this command below:
+To start working with MongoDB we first need to create a new directory launch it and for that we will use this command below:
 
 ``
-C:\Program Files\MongoDB\Server\5.0\bin\mongod.exe --dbpath C:\Program Files\MongoDB\Server\5.0\data\
+C:\Program Files\MongoDB\Server\5.0\bin\mongod.exe --dbpath *path to the directory*
 ``
 
 After running this command you can open MongoDB Compass and just simply click **Connect** to connect to your localhost database.
@@ -181,6 +186,12 @@ Here is an example validation:
     }
 
 It requires all objects in this collection to have a title and a price field. You can also set validation action and level.
+
+## Indexes
+
+[What are indexes in MongoDB?](https://docs.mongodb.com/manual/indexes/)
+
+> Indexes are special data structures that store a small portion of the collection's data set in an easy to traverse form. The index stores the value of a specific field or set of fields, ordered by the value of the field.
 
 # The End
 
